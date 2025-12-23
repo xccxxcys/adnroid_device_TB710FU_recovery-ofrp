@@ -135,8 +135,6 @@ jobs:
           python3 \
           python3-pip \
           python3-setuptools
-          # 修复：补全 avbtool 安装目标，确保 AVB2.0 验证工具正常安装
-          sudo pip3 install avbtool 
           git config --global user.name ${{ github.actor }}
           git config --global user.email ${{ github.actor }}@users.noreply.github.com
           sudo curl -L -o /usr/local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo
