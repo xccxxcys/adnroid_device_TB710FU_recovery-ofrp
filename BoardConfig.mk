@@ -3,20 +3,23 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-
 # Building with minimal manifest
+
+
 ALLOW_MISSING_DEPENDENCIES                      := true
 BUILD_BROKEN_DUP_RULES                          := true
 BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES    := true
-
 BUILD_BROKEN_NINJA_USES_ENV_VARS    += RTIC_MPGEN
 BUILD_BROKEN_PLUGIN_VALIDATION      := soong-libaosprecovery_defaults soong-libguitwrp_defaults soong-libminuitwrp_defaults soong-vold_defaults
 
+
 # Architecture
+
 TARGET_ARCH                 := arm64
 TARGET_ARCH_VARIANT         := armv8-a
 TARGET_CPU_ABI              := arm64-v8a
 TARGET_CPU_VARIANT          := kryo
+
 
 # A/B
 AB_OTA_PARTITIONS := \
@@ -34,10 +37,12 @@ AB_OTA_PARTITIONS := \
     vbmeta_vendor \
     vendor \
     vendor_dlkm
-
+    
+    
 # Bootloader
 PRODUCT_PLATFORM                := pineapple
 TARGET_BOOTLOADER_BOARD_NAME    := pineapple
+
 
 # Crypto
 BOARD_USES_METADATA_PARTITION   := true
@@ -61,7 +66,6 @@ BOARD_BOOT_HEADER_VERSION   := 4
 BOARD_KERNEL_PAGESIZE       := 4096
 BOARD_MKBOOTIMG_ARGS        += --header_version $(BOARD_BOOT_HEADER_VERSION)
 BOARD_MKBOOTIMG_ARGS        += --pagesize $(BOARD_KERNEL_PAGESIZE)
-
 BOARD_RAMDISK_USE_LZ4       := true
 
 # Partitions
@@ -74,7 +78,6 @@ BOARD_SUPER_PARTITION_GROUPS := qti_dynamic_partitions
 BOARD_QTI_DYNAMIC_PARTITIONS_SIZE := 19318964224
 BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := \
 	system system_ext product vendor vendor_dlkm odm
-
 BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := ext4
 TARGET_COPY_OUT_ODM             := odm
 TARGET_COPY_OUT_VENDOR          := vendor
@@ -96,6 +99,7 @@ TW_INCLUDE_RESETPROP          := true
 TW_USE_TOOLBOX                := true
 TW_INCLUDE_ZSTD               := true
 
+
 # TWRP display
 TW_BRIGHTNESS_PATH      := /sys/class/backlight/panel0-backlight/brightness
 TW_DEFAULT_BRIGHTNESS   := 2048
@@ -103,11 +107,10 @@ TW_FRAMERATE            := 120
 TW_MAX_BRIGHTNESS       := 4095
 TW_SCREEN_BLANK_ON_BOOT := true
 TW_INPUT_BLACKLIST := "hbtp_vm"
-TW_THEME := landscape_hdpi #portrait_hdpi
-TW_ROTATION := 0 
+TW_THEME := landscape_hdpi #portrait_hdpi 采用横屏主题
+TW_ROTATION := 0  #不旋转
 RECOVERY_TOUCHSCREEN_SWAP_XY := true    
 RECOVERY_TOUCHSCREEN_FLIP_Y := true 
-
 # TWRP file system
 RECOVERY_SDCARD_ON_DATA     := true
 TARGET_USES_MKE2FS          := true
@@ -117,6 +120,7 @@ TW_INCLUDE_FUSE_NTFS        := true
 TW_INCLUDE_NTFS_3G          := true
 TW_NO_EXFAT_FUSE            := true
 
+
 # Version
 PLATFORM_VERSION                := 99.87.36
 PLATFORM_VERSION_LAST_STABLE    := $(PLATFORM_VERSION)
@@ -124,10 +128,27 @@ PLATFORM_SECURITY_PATCH         := 2099-12-31
 VENDOR_SECURITY_PATCH           := $(PLATFORM_SECURITY_PATCH)
 TW_DEVICE_VERSION               := Lenovo Xiaoxin Pad Pro GT
 
-# Verified Boot
+# Verified Boot 用ai写的doge，by nanya
 BOARD_AVB_ENABLE := true
+BOARD_AVB_KEY_PATH := $(DEVICE_PATH)/security/testkey_rsa4096.pem  # 4096位密钥（优先使用）
+BOARD_AVB_ALGORITHM := SHA256_RSA4096  # 算法与密钥比特率匹配
+BOARD_AVB_VBMETA_KEY_PATH := $(BOARD_AVB_KEY_PATH)  # vbmeta分区复用密钥
+BOARD_AVB_VBMETA_ALGORITHM := $(BOARD_AVB_ALGORITHM)
+BOARD_AVB_VBMETA_IMAGE_FLAGS += --flags 2  # 强制AVB2.0校验（关键参数）
 
 
+# 其他核心分区AVB2.0签名配置
+BOARD_AVB_BOOT_KEY_PATH := $(BOARD_AVB_KEY_PATH)
+BOARD_AVB_BOOT_ALGORITHM := $(BOARD_AVB_ALGORITHM)
+BOARD_AVB_VENDOR_BOOT_KEY_PATH := $(BOARD_AVB_KEY_PATH)
+BOARD_AVB_VENDOR_BOOT_ALGORITHM := $(BOARD_AVB_ALGORITHM)
+BOARD_AVB_SYSTEM_KEY_PATH := $(BOARD_AVB_KEY_PATH)
+BOARD_AVB_SYSTEM_ALGORITHM := $(BOARD_AVB_ALGORITHM)
+BOARD_AVB_VENDOR_KEY_PATH := $(BOARD_AVB_KEY_PATH)
+BOARD_AVB_VENDOR_ALGORITHM := $(BOARD_AVB_ALGORITHM)
+
+# 密钥文件权限配置（确保编译时可访问）
+BOARD_AVB_KEY_PATH_PERMISSIONS := 0644
 # Other TWRP Configurations
 TARGET_RECOVERY_QCOM_RTC_FIX            := true
 TW_CUSTOM_CPU_TEMP_PATH                 := "/sys/class/thermal/thermal_zone48/temp"

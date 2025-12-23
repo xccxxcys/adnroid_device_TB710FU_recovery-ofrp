@@ -33,7 +33,23 @@ PRODUCT_ENABLE_UFFD_GC                          := true
 
 # OTA certs
 PRODUCT_EXTRA_RECOVERY_KEYS += \
-	$(DEVICE_PATH)/security/releasekey
+	$(DEVICE_PATH)/security/releasekey.x509.pem \
+	$(DEVICE_PATH)/security/testkey_rsa2048.pem \
+	$(DEVICE_PATH)/security/testkey_rsa4096.pem
+	
+# 新增PEM密钥文件复制（编译时同步到设备）
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/security/testkey_rsa2048.pem:$(TARGET_COPY_OUT_VENDOR)/etc/security/testkey_rsa2048.pem \
+    $(DEVICE_PATH)/security/testkey_rsa4096.pem:$(TARGET_COPY_OUT_VENDOR)/etc/security/testkey_rsa4096.pem \
+    $(DEVICE_PATH)/security/releasekey.x509.pem:$(TARGET_COPY_OUT_VENDOR)/etc/security/releasekey.x509.pem
+    
+# AVB2.0 签名密钥依赖（告知编译系统使用自定义密钥）
+PRODUCT_AVB_KEYS += \
+    $(DEVICE_PATH)/security/testkey_rsa2048.pem \
+    $(DEVICE_PATH)/security/testkey_rsa4096.pem
+    
+# 禁用默认AVB密钥，强制使用自定义密钥
+PRODUCT_AVB_DISABLE_DEFAULT_KEY := true
 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += $(DEVICE_PATH)
