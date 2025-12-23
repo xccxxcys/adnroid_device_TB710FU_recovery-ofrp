@@ -149,6 +149,7 @@ BOARD_AVB_VENDOR_ALGORITHM := $(BOARD_AVB_ALGORITHM)
 
 # 密钥文件权限配置（确保编译时可访问）
 BOARD_AVB_KEY_PATH_PERMISSIONS := 0644
+
 # Other TWRP Configurations
 TARGET_RECOVERY_QCOM_RTC_FIX            := true
 TW_CUSTOM_CPU_TEMP_PATH                 := "/sys/class/thermal/thermal_zone48/temp"
