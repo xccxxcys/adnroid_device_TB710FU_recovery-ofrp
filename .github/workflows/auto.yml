@@ -147,12 +147,12 @@ jobs:
             TWRP_REPO="https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git"
             TWRP_BRANCH="twrp-14"
             repo init -u $TWRP_REPO -b $TWRP_BRANCH --depth=1          
-            repo sync
+            repo sync --force-sync external/libchrome
             git clone https://gitlab.com/OrangeFox/sync.git -b master
             chmod +x sync/orangefox_sync.sh
             cd sync
             ./orangefox_sync.sh --branch ${{ inputs.MANIFEST_BRANCH }} --path $WORKINGDIR
-            repo sync
+            repo sync --force-sync external/libchrome
             cd $WORKINGDIR
           else
             git clone https://gitlab.com/OrangeFox/sync.git -b master
