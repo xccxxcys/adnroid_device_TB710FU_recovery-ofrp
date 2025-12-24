@@ -89,7 +89,7 @@ export OF_SCREEN_H=2000  # 实际屏幕纵向分辨率
 export OF_STATUS_H=140  # 状态栏高度（适配高分辨率，比例协调）
 export OF_STATUS_INDENT_LEFT=70  # 状态栏左侧缩进（适配宽屏，图标不贴边）
 export OF_STATUS_INDENT_RIGHT=70  # 状态栏右侧缩进（与左侧对称）
-#export FOX_USE_LANDSCAPE_MODE=1  # 强制启用横屏界面（关键变量）
+export FOX_USE_LANDSCAPE_MODE=1  # 强制启用横屏界面（关键变量）
 # 4. 触摸坐标适配（预留，实际硬件触摸无错位可保持默认）
 # export OF_TOUCHSCREEN_ROTATION=0  # 0=正常横屏，无需旋转
 export OF_HIDE_NOTCH=0  # 平板无刘海，禁用隐藏
