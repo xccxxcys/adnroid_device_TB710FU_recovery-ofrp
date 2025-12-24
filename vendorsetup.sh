@@ -114,9 +114,10 @@ export FOX_MOVE_MAGISK_INSTALLER_TO_RAMDISK=1  # 将Magisk安装包移至ramdisk
 
 #启动画面修改（保持原有配置，注释冗余重复项）
 
-F=$(find "device" -maxdepth 2 -name "sm86xx")
+F=$(find "device" -maxdepth 2 -name "topaz")
 \cp -fp bootable/recovery/gui/theme/landscape_hdpi/splash.xml "$F"/recovery/root/twres/splash.xml
 sed -i 's/value="#D34E38"/value="#000000"/g' "$F"/recovery/root/twres/splash.xml  # 替换橙色为黑色
 sed -i 's/value="#FF8038"/value="#000000"/g' "$F"/recovery/root/twres/splash.xml  # 替换浅橙色为黑色
 
 echo -e "\x1b[96mAdontoo: 所有OrangeFox配置变量加载完毕！\x1b[m"
+"
