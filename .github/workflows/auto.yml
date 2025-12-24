@@ -144,7 +144,7 @@ jobs:
         run: |
           WORKINGDIR=$(pwd)
           if [ "${{ inputs.MANIFEST_BRANCH }}" = "14.1" ]; then
-            TWRP_REPO="https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp"
+            TWRP_REPO="https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git"
             TWRP_BRANCH="twrp-14.1"
             repo init -u $TWRP_REPO -b $TWRP_BRANCH --depth=1
             repo sync 
