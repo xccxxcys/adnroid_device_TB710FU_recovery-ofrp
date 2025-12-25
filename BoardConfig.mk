@@ -121,10 +121,17 @@ PLATFORM_SECURITY_PATCH         := 2099-12-31
 VENDOR_SECURITY_PATCH           := $(PLATFORM_SECURITY_PATCH)
 TW_DEVICE_VERSION               := Lenovo Xiaoxin Pad Pro GT
 
+# ========================== OTA密钥配置（保留releasekey.x509.pem）==========================
+# 明确OTA签名密钥用途，避免与AVB密钥混淆
+BOARD_OTA_PUBLIC_KEYS := $(DEVICE_PATH)/security/releasekey.x509.pem
+BOARD_OTA_KEY_CERT := $(DEVICE_PATH)/security/releasekey.x509.pem
+# 禁用AVB对OTA密钥的自动解析，仅用于OTA签名
+BOARD_AVB_IGNORE_VENDOR_OTA_KEYS := true
+
 # ========================== AVB2.0 核心配置（仅针对recovery）==========================
 BOARD_AVB_ENABLE := true  # 启用AVB2.0签名
 BOARD_AVB_ALGORITHM := SHA256_RSA4096  # 算法与4096位密钥匹配
-BOARD_AVB_KEY_PATH := $(DEVICE_PATH)/security/testkey_rsa4096.pem  # 签名密钥路径
+BOARD_AVB_KEY_PATH := $(DEVICE_PATH)/security/testkey_rsa4096.pem  # AVB签名仅用testkey_rsa4096.pem
 
 # recovery专属AVB配置（AVB2.0规范强制要求）
 BOARD_AVB_RECOVERY_ADD_HASH_FOOTER := true  # 给recovery.img添加AVB元数据
@@ -142,7 +149,7 @@ BOARD_AVB_VBMETA_DESCRIPTORS += \
   --add_hash_descriptor \
   recovery:hash_alg=SHA256_RSA4096:key_path=$(BOARD_AVB_RECOVERY_KEY_PATH):partition_size=$(BOARD_RECOVERYIMAGE_PARTITION_SIZE)
 
-# 密钥文件权限（确保编译时可访问）
+# 密钥文件权限（确保编译时可访问，避免路径解析错误）
 BOARD_AVB_KEY_PATH_PERMISSIONS := 0644
 
 # Other TWRP Configurations
