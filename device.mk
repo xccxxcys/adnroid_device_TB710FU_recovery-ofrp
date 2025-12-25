@@ -46,8 +46,5 @@ PRODUCT_COPY_FILES += \
 PRODUCT_AVB_KEYS += $(DEVICE_PATH)/security/testkey_rsa4096.pem
 PRODUCT_AVB_DISABLE_DEFAULT_KEY := true
 
-# 3. 继承AVB编译规则，自动生成带签名的recovery.img和vbmeta.img
-$(call inherit-product, build/make/target/product/avb.mk)
-
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += $(DEVICE_PATH)
