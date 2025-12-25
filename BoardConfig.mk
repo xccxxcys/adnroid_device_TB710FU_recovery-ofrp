@@ -121,13 +121,6 @@ PLATFORM_SECURITY_PATCH         := 2099-12-31
 VENDOR_SECURITY_PATCH           := $(PLATFORM_SECURITY_PATCH)
 TW_DEVICE_VERSION               := Lenovo Xiaoxin Pad Pro GT
 
-# ========================== OTA密钥配置（保留releasekey.x509.pem）==========================
-# 明确OTA签名密钥用途，避免与AVB密钥混淆
-BOARD_OTA_PUBLIC_KEYS := $(DEVICE_PATH)/security/releasekey.x509.pem
-BOARD_OTA_KEY_CERT := $(DEVICE_PATH)/security/releasekey.x509.pem
-# 禁用AVB对OTA密钥的自动解析，仅用于OTA签名
-BOARD_AVB_IGNORE_VENDOR_OTA_KEYS := true
-
 # ========================== AVB2.0 核心配置（仅针对recovery）==========================
 BOARD_AVB_ENABLE := true  # 启用AVB2.0签名
 BOARD_AVB_ALGORITHM := SHA256_RSA4096  # 算法与4096位密钥匹配
@@ -139,15 +132,6 @@ BOARD_AVB_RECOVERY_KEY_PATH := $(BOARD_AVB_KEY_PATH)  # recovery签名密钥
 BOARD_AVB_RECOVERY_ALGORITHM := $(BOARD_AVB_ALGORITHM)  # 复用算法
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 0  # 回滚索引（初始值0，后续可递增）
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 0  # 回滚索引存储位置（默认0）
-
-# vbmeta配置（包含recovery验证信息，bootloader校验核心）
-BOARD_AVB_VBMETA_KEY_PATH := $(BOARD_AVB_KEY_PATH)
-BOARD_AVB_VBMETA_ALGORITHM := $(BOARD_AVB_ALGORITHM)
-BOARD_AVB_VBMETA_IMAGE_FLAGS += --flags 3  # 允许非官方签名（自用/测试场景）
-# 给vbmeta添加recovery分区的哈希描述符（必须与recovery分区大小匹配）
-BOARD_AVB_VBMETA_DESCRIPTORS += \
-  --add_hash_descriptor \
-  recovery:hash_alg=SHA256_RSA4096:key_path=$(BOARD_AVB_RECOVERY_KEY_PATH):partition_size=$(BOARD_RECOVERYIMAGE_PARTITION_SIZE)
 
 # 密钥文件权限（确保编译时可访问，避免路径解析错误）
 BOARD_AVB_KEY_PATH_PERMISSIONS := 0644

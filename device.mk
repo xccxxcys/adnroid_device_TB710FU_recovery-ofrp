@@ -28,9 +28,7 @@ PRODUCT_ENABLE_UFFD_GC                          := true
 
 # OTA certs（保留releasekey.x509.pem作为OTA签名密钥，路径无重复后缀）
 PRODUCT_EXTRA_RECOVERY_KEYS += \
-	$(DEVICE_PATH)/security/releasekey.x509.pem \
-	$(DEVICE_PATH)/security/testkey_rsa2048.pem \
-	$(DEVICE_PATH)/security/testkey_rsa4096.pem
+	$(DEVICE_PATH)/security/local_OTA 
 	
 # AVB2.0 签名核心配置（仅使用testkey_rsa4096.pem，与OTA密钥区分）
 # 1. 复制所有密钥到镜像，确保签名/OTA时可访问
