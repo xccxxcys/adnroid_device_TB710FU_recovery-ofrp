@@ -4,22 +4,17 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Building with minimal manifest
-
-
 ALLOW_MISSING_DEPENDENCIES                      := true
 BUILD_BROKEN_DUP_RULES                          := true
 BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES    := true
 BUILD_BROKEN_NINJA_USES_ENV_VARS    += RTIC_MPGEN
 BUILD_BROKEN_PLUGIN_VALIDATION      := soong-libaosprecovery_defaults soong-libguitwrp_defaults soong-libminuitwrp_defaults soong-vold_defaults
 
-
 # Architecture
-
 TARGET_ARCH                 := arm64
 TARGET_ARCH_VARIANT         := armv8-a
 TARGET_CPU_ABI              := arm64-v8a
 TARGET_CPU_VARIANT          := kryo
-
 
 # A/B
 AB_OTA_UPDATER := true
@@ -38,12 +33,10 @@ AB_OTA_PARTITIONS := \
     vbmeta_vendor \
     vendor \
     vendor_dlkm
-    
-    
+
 # Bootloader
 PRODUCT_PLATFORM                := pineapple
 TARGET_BOOTLOADER_BOARD_NAME    := pineapple
-
 
 # Crypto
 BOARD_USES_METADATA_PARTITION   := true
@@ -71,7 +64,7 @@ BOARD_RAMDISK_USE_LZ4       := true
 
 # Partitions
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED  := true
-BOARD_RECOVERYIMAGE_PARTITION_SIZE      := 104857600
+BOARD_RECOVERYIMAGE_PARTITION_SIZE      := 104857600  # recovery分区大小，不可修改
 
 # Dynamic Partition
 BOARD_SUPER_PARTITION_SIZE := 20401094656
@@ -100,7 +93,6 @@ TW_INCLUDE_RESETPROP          := true
 TW_USE_TOOLBOX                := true
 TW_INCLUDE_ZSTD               := true
 
-
 # TWRP display
 TW_BRIGHTNESS_PATH      := /sys/class/backlight/panel0-backlight/brightness
 TW_DEFAULT_BRIGHTNESS   := 2048
@@ -108,10 +100,11 @@ TW_FRAMERATE            := 120
 TW_MAX_BRIGHTNESS       := 4095
 TW_SCREEN_BLANK_ON_BOOT := true
 TW_INPUT_BLACKLIST := "hbtp_vm"
-TW_THEME := portrait_hdpi  #landscape_hdpi
-TW_ROTATION := 0  #不旋转
+TW_THEME := portrait_hdpi
+TW_ROTATION := 0
 RECOVERY_TOUCHSCREEN_SWAP_XY := true    
 RECOVERY_TOUCHSCREEN_FLIP_Y := true 
+
 # TWRP file system
 RECOVERY_SDCARD_ON_DATA     := true
 TARGET_USES_MKE2FS          := true
@@ -121,7 +114,6 @@ TW_INCLUDE_FUSE_NTFS        := true
 TW_INCLUDE_NTFS_3G          := true
 TW_NO_EXFAT_FUSE            := true
 
-
 # Version
 PLATFORM_VERSION                := 99.87.36
 PLATFORM_VERSION_LAST_STABLE    := $(PLATFORM_VERSION)
@@ -129,26 +121,28 @@ PLATFORM_SECURITY_PATCH         := 2099-12-31
 VENDOR_SECURITY_PATCH           := $(PLATFORM_SECURITY_PATCH)
 TW_DEVICE_VERSION               := Lenovo Xiaoxin Pad Pro GT
 
-# Verified Boot 用ai写的doge，by nanya
-BOARD_AVB_ENABLE := true
-BOARD_AVB_KEY_PATH := $(DEVICE_PATH)/security/testkey_rsa4096.pem  # 4096位密钥（优先使用）
-BOARD_AVB_ALGORITHM := SHA256_RSA4096  # 算法与密钥比特率匹配
-BOARD_AVB_VBMETA_KEY_PATH := $(BOARD_AVB_KEY_PATH)  # vbmeta分区复用密钥
+# ========================== AVB2.0 核心配置（仅针对recovery）==========================
+BOARD_AVB_ENABLE := true  # 启用AVB2.0签名
+BOARD_AVB_ALGORITHM := SHA256_RSA4096  # 算法与4096位密钥匹配
+BOARD_AVB_KEY_PATH := $(DEVICE_PATH)/security/testkey_rsa4096.pem  # 签名密钥路径
+
+# recovery专属AVB配置（AVB2.0规范强制要求）
+BOARD_AVB_RECOVERY_ADD_HASH_FOOTER := true  # 给recovery.img添加AVB元数据
+BOARD_AVB_RECOVERY_KEY_PATH := $(BOARD_AVB_KEY_PATH)  # recovery签名密钥
+BOARD_AVB_RECOVERY_ALGORITHM := $(BOARD_AVB_ALGORITHM)  # 复用算法
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 0  # 回滚索引（初始值0，后续可递增）
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 0  # 回滚索引存储位置（默认0）
+
+# vbmeta配置（包含recovery验证信息，bootloader校验核心）
+BOARD_AVB_VBMETA_KEY_PATH := $(BOARD_AVB_KEY_PATH)
 BOARD_AVB_VBMETA_ALGORITHM := $(BOARD_AVB_ALGORITHM)
-BOARD_AVB_VBMETA_IMAGE_FLAGS += --flags 2  # 强制AVB2.0校验（关键参数）
+BOARD_AVB_VBMETA_IMAGE_FLAGS += --flags 3  # 允许非官方签名（自用/测试场景）
+# 给vbmeta添加recovery分区的哈希描述符（必须与recovery分区大小匹配）
+BOARD_AVB_VBMETA_DESCRIPTORS += \
+  --add_hash_descriptor \
+  recovery:hash_alg=SHA256_RSA4096:key_path=$(BOARD_AVB_RECOVERY_KEY_PATH):partition_size=$(BOARD_RECOVERYIMAGE_PARTITION_SIZE)
 
-
-# 其他核心分区AVB2.0签名配置
-BOARD_AVB_BOOT_KEY_PATH := $(BOARD_AVB_KEY_PATH)
-BOARD_AVB_BOOT_ALGORITHM := $(BOARD_AVB_ALGORITHM)
-BOARD_AVB_VENDOR_BOOT_KEY_PATH := $(BOARD_AVB_KEY_PATH)
-BOARD_AVB_VENDOR_BOOT_ALGORITHM := $(BOARD_AVB_ALGORITHM)
-BOARD_AVB_SYSTEM_KEY_PATH := $(BOARD_AVB_KEY_PATH)
-BOARD_AVB_SYSTEM_ALGORITHM := $(BOARD_AVB_ALGORITHM)
-BOARD_AVB_VENDOR_KEY_PATH := $(BOARD_AVB_KEY_PATH)
-BOARD_AVB_VENDOR_ALGORITHM := $(BOARD_AVB_ALGORITHM)
-
-# 密钥文件权限配置（确保编译时可访问）
+# 密钥文件权限（确保编译时可访问）
 BOARD_AVB_KEY_PATH_PERMISSIONS := 0644
 
 # Other TWRP Configurations

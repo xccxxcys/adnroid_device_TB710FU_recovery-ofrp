@@ -11,7 +11,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 
 # Configure virtual_ab compression.mk
-$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/compression.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/compression_with_xor.mk)
 
 # Enable Project Quotas and Case Folding
 $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
@@ -37,19 +37,17 @@ PRODUCT_EXTRA_RECOVERY_KEYS += \
 	$(DEVICE_PATH)/security/testkey_rsa2048.pem \
 	$(DEVICE_PATH)/security/testkey_rsa4096.pem
 	
-# 新增PEM密钥文件复制（编译时同步到设备）
+# AVB2.0 签名核心配置（仅保留recovery所需）
+# 1. 复制密钥到镜像，确保签名时可访问
 PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/security/testkey_rsa2048.pem:$(TARGET_COPY_OUT_VENDOR)/etc/security/testkey_rsa2048.pem \
-    $(DEVICE_PATH)/security/testkey_rsa4096.pem:$(TARGET_COPY_OUT_VENDOR)/etc/security/testkey_rsa4096.pem \
-    $(DEVICE_PATH)/security/releasekey.x509.pem:$(TARGET_COPY_OUT_VENDOR)/etc/security/releasekey.x509.pem
-    
-# AVB2.0 签名密钥依赖（告知编译系统使用自定义密钥）
-PRODUCT_AVB_KEYS += \
-    $(DEVICE_PATH)/security/testkey_rsa2048.pem \
-    $(DEVICE_PATH)/security/testkey_rsa4096.pem
-    
-# 禁用默认AVB密钥，强制使用自定义密钥
+    $(DEVICE_PATH)/security/testkey_rsa4096.pem:$(TARGET_COPY_OUT_VENDOR)/etc/security/testkey_rsa4096.pem
+
+# 2. 声明AVB密钥，禁用默认密钥
+PRODUCT_AVB_KEYS += $(DEVICE_PATH)/security/testkey_rsa4096.pem
 PRODUCT_AVB_DISABLE_DEFAULT_KEY := true
+
+# 3. 继承AVB编译规则，自动生成带签名的recovery.img和vbmeta.img
+$(call inherit-product, build/make/target/product/avb.mk)
 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += $(DEVICE_PATH)
