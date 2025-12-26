@@ -1,4 +1,4 @@
-这是一个fork版本，旨在适配ofrp14.1
+这是一个fork版本，旨在适配ofrp14.1，在里面添加了来自adontoo的wifi风味doge(ps:用AI写的，并不怎么好，不过能跑就行doge)
 
 # TWRP device tree for Lenovo Xiaoxin Pad Pro GT
 
